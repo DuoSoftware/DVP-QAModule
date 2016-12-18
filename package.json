@@ -1,0 +1,28 @@
+{
+  "name": "dvp-qamodule",
+  "version": "1.0.0",
+  "description": "DVP-QAModule",
+  "main": "app.js",
+  "dependencies": {
+    "config": "^1.24.0",
+    "dvp-common": "^0.5.7",
+    "dvp-mongomodels": "^3.9.8",
+    "mongoose": "^4.7.2",
+    "restify": "^4.3.0",
+    "restify-jwt": "^0.4.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/DuoSoftware/DVP-QAModule.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/DuoSoftware/DVP-QAModule/issues"
+  },
+  "homepage": "https://github.com/DuoSoftware/DVP-QAModule#readme"
+}
