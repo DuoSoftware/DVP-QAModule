@@ -6,7 +6,7 @@
   "dependencies": {
     "config": "^1.24.0",
     "dvp-common": "^0.5.7",
-    "dvp-mongomodels": "^3.9.8",
+    "dvp-mongomodels": "^4.0.4",
     "mongoose": "^4.7.2",
     "restify": "^4.3.0",
     "restify-jwt": "^0.4.0"

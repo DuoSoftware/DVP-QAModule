@@ -227,7 +227,7 @@ server.post('/DVP/API/:version/QAModule/Section',authorization({resource:"qualit
 
 });
 
-server.get('/DVP/API/:version/QAModule/Questions',authorization({resource:"qualityassurance", action:"get"}),function (req, res, next) {
+server.get('/DVP/API/:version/QAModule/Questions',authorization({resource:"qualityassurance", action:"read"}),function (req, res, next) {
     logger.info("DVP-QAModule.GetQuestions Internal method ");
     var company = parseInt(req.user.company);
     var tenant = parseInt(req.user.tenant);
@@ -294,7 +294,7 @@ server.del('/DVP/API/:version/QAModule/Question/:id',authorization({resource:"qu
     next();
 });
 
-server.get('/DVP/API/:version/QAModule/Question/:id',authorization({resource:"qualityassurance", action:"get"}),function (req, res, next) {
+server.get('/DVP/API/:version/QAModule/Question/:id',authorization({resource:"qualityassurance", action:"read"}),function (req, res, next) {
     logger.info("DVP-QAModule.GetQuestion Internal method ");
     var company = parseInt(req.user.company);
     var tenant = parseInt(req.user.tenant);
@@ -328,7 +328,7 @@ server.get('/DVP/API/:version/QAModule/Question/:id',authorization({resource:"qu
     next();
 });
 
-server.get('/DVP/API/:version/QAModule/Sections',authorization({resource:"qualityassurance", action:"get"}),function (req, res, next) {
+server.get('/DVP/API/:version/QAModule/Sections',authorization({resource:"qualityassurance", action:"read"}),function (req, res, next) {
     logger.info("DVP-QAModule.GetSections Internal method ");
     var company = parseInt(req.user.company);
     var tenant = parseInt(req.user.tenant);
@@ -344,13 +344,13 @@ server.get('/DVP/API/:version/QAModule/Sections',authorization({resource:"qualit
 
         } else {
 
-            if (questions) {
+            if (sections) {
 
                 jsonString = msg.FormatMessage(undefined, "Get all sectios Successful", true, sections);
 
             } else {
 
-                jsonString = msg.FormatMessage(undefined, "No section Found", false, undefined);
+                jsonString = msg.FormatMessage(undefined, "No section Found", true, sections);
 
             }
         }
@@ -361,7 +361,7 @@ server.get('/DVP/API/:version/QAModule/Sections',authorization({resource:"qualit
     next();
 });
 
-server.get('/DVP/API/:version/QAModule/Section/:id',authorization({resource:"qualityassurance", action:"get"}),function (req, res, next) {
+server.get('/DVP/API/:version/QAModule/Section/:id',authorization({resource:"qualityassurance", action:"read"}),function (req, res, next) {
     logger.info("DVP-QAModule.GetSection Internal method ");
     var company = parseInt(req.user.company);
     var tenant = parseInt(req.user.tenant);
@@ -461,7 +461,7 @@ server.post('/DVP/API/:version/QAModule/Paper',authorization({resource:"qualitya
 
 });
 
-server.get('/DVP/API/:version/QAModule/QuestionPapers',authorization({resource:"qualityassurance", action:"get"}),function (req, res, next) {
+server.get('/DVP/API/:version/QAModule/QuestionPapers',authorization({resource:"qualityassurance", action:"read"}),function (req, res, next) {
     logger.info("DVP-QAModule.GetQuestionPapers Internal method ");
     var company = parseInt(req.user.company);
     var tenant = parseInt(req.user.tenant);
@@ -470,41 +470,43 @@ server.get('/DVP/API/:version/QAModule/QuestionPapers',authorization({resource:"
         company: company,
         tenant: tenant,
         active: true
-    }, function (err, qp) {
-        //db.posts.find( //query today up to tonight  {"created_on": {"$gte": new Date(2012, 7, 14), "$lt": new Date(2012, 7, 15)}})
-        if (err) {
+    }).populate('questions')
+        .exec(function (err, qp) {
+            //db.posts.find( //query today up to tonight  {"created_on": {"$gte": new Date(2012, 7, 14), "$lt": new Date(2012, 7, 15)}})
+            if (err) {
 
-            jsonString = msg.FormatMessage(err, "Get all question papers failed", false, undefined);
-
-        } else {
-
-            if (qp) {
-
-                jsonString = msg.FormatMessage(undefined, "Get all question papers Successful", true, qp);
+                jsonString = msg.FormatMessage(err, "Get all question papers failed", false, undefined);
 
             } else {
 
-                jsonString = msg.FormatMessage(undefined, "No question papers Found", false, qp);
+                if (qp) {
 
+                    jsonString = msg.FormatMessage(undefined, "Get all question papers Successful", true, qp);
+
+                } else {
+
+                    jsonString = msg.FormatMessage(undefined, "No question papers Found", false, qp);
+
+                }
             }
-        }
 
-        res.end(jsonString);
-    });
+            res.end(jsonString);
+        });
 
     next();
 });
 
-server.get('/DVP/API/:version/QAModule/QuestionPaper/:id',authorization({resource:"qualityassurance", action:"get"}),function (req, res, next) {
+server.get('/DVP/API/:version/QAModule/QuestionPaper/:id',authorization({resource:"qualityassurance", action:"read"}),function (req, res, next) {
     logger.info("DVP-QAModule.GetQuestionPaper Internal method ");
     var company = parseInt(req.user.company);
     var tenant = parseInt(req.user.tenant);
     var jsonString;
-    Question.findOne({
+    Paper.findOne({
         _id: req.params.id,
         company: company,
         tenant: tenant
-    }, function (err, qp) {
+    }).populate('questions')
+        .exec(function (err, qp) {
         //db.posts.find( //query today up to tonight  {"created_on": {"$gte": new Date(2012, 7, 14), "$lt": new Date(2012, 7, 15)}})
         if (err) {
 
@@ -686,6 +688,59 @@ server.del('/DVP/API/:version/QAModule/QuestionPaper/:id/Question/:qid',authoriz
 
 });
 
+server.del('/DVP/API/:version/QAModule/QuestionPaperSubmission/:id',authorization({resource:"qualityassurance", action:"delete"}), function(req, res, next){
+
+
+    logger.debug("DVP-QAModule.DeleteQuestionFromPaper HTTP");
+    var company;
+    var tenant;
+    var jsonString;
+
+    if(req&& req.user && req.user.company && req.user.tenant) {
+
+        company = req.user.company;
+        tenant = req.user.tenant;
+
+        logger.info("DVP-QAModule.DeleteQuestionPaperSubmission successful");
+        //jsonString = msg.FormatMessage(err, "Question creation successful", true, question);
+
+        Submission.findOneAndRemove({
+            _id: req.params.id,
+            company: company,
+            tenant: tenant
+        }, function (err, questions) {
+            //db.posts.find( //query today up to tonight  {"created_on": {"$gte": new Date(2012, 7, 14), "$lt": new Date(2012, 7, 15)}})
+            if (err) {
+
+                jsonString = msg.FormatMessage(err, "Delete submission failed", false, undefined);
+
+            } else {
+
+                if (questions) {
+
+                    jsonString = msg.FormatMessage(undefined, "Delete submission Successful", true, questions);
+
+                } else {
+
+                    jsonString = msg.FormatMessage(undefined, "No question Found", false, questions);
+
+                }
+            }
+
+            res.end(jsonString);
+        });
+
+    }else {
+
+        logger.error("DVP-QAModule.DeleteQuestionFromPaper failed ");
+        jsonString = msg.FormatMessage(undefined, "Submission delete failed", false, undefined);
+        res.end(jsonString);
+    }
+
+    return next();
+
+});
+
 server.post('/DVP/API/:version/QAModule/QuestionPaperSubmission',authorization({resource:"qualityassurance", action:"write"}), function(req, res, next){
 
 
@@ -811,7 +866,7 @@ server.put('/DVP/API/:version/QAModule/QuestionPaperSubmission/:id/QuestionAnswe
                                     logger.info("DVP-QAModule.CreateAnswer successful");
                                     jsonString = msg.FormatMessage(err, "Answer creation successful", true, answer);
 
-                                    Submission.update({
+                                    sub.update({
                                         "$set": {
                                             "updated_at": Date.now()
                                         },
@@ -962,7 +1017,7 @@ server.put('/DVP/API/:version/QAModule/QuestionPaperSubmission/:id/Complete',aut
 
 });
 
-server.get('/DVP/API/:version/QAModule/QuestionPaperSubmission',authorization({resource:"qualityassurance", action:"get"}),function (req, res, next) {
+server.get('/DVP/API/:version/QAModule/QuestionPaperSubmission',authorization({resource:"qualityassurance", action:"read"}),function (req, res, next) {
     logger.info("DVP-QAModule.GetQuestionPaperSubmission Internal method ");
     var company = parseInt(req.user.company);
     var tenant = parseInt(req.user.tenant);
@@ -995,7 +1050,7 @@ server.get('/DVP/API/:version/QAModule/QuestionPaperSubmission',authorization({r
     next();
 });
 
-server.get('/DVP/API/:version/QAModule/QuestionPaperSubmission/:id',authorization({resource:"qualityassurance", action:"get"}),function (req, res, next) {
+server.get('/DVP/API/:version/QAModule/QuestionPaperSubmission/:id',authorization({resource:"qualityassurance", action:"read"}),function (req, res, next) {
     logger.info("DVP-QAModule.QuestionPaperSubmission Internal method ");
     var company = parseInt(req.user.company);
     var tenant = parseInt(req.user.tenant);
@@ -1029,16 +1084,63 @@ server.get('/DVP/API/:version/QAModule/QuestionPaperSubmission/:id',authorizatio
     next();
 });
 
-server.get('/DVP/API/:version/QAModule/QuestionPaperSubmission/Completed/:status',authorization({resource:"qualityassurance", action:"get"}),function (req, res, next) {
+server.get('/DVP/API/:version/QAModule/QuestionPaperSubmission/Session/:id',authorization({resource:"qualityassurance", action:"read"}),function (req, res, next) {
+    logger.info("DVP-QAModule.QuestionPaperSubmission Internal method ");
+    var company = parseInt(req.user.company);
+    var tenant = parseInt(req.user.tenant);
+
+    Submission.findOne({
+        session: req.params.id,
+        company: company,
+        tenant: tenant
+    }).populate('paper')
+        .exec(function (err, sub) {
+        //db.posts.find( //query today up to tonight  {"created_on": {"$gte": new Date(2012, 7, 14), "$lt": new Date(2012, 7, 15)}})
+        if (err) {
+
+            jsonString = msg.FormatMessage(err, "Get paper submission failed", false, undefined);
+
+        } else {
+
+            if (sub) {
+
+                jsonString = msg.FormatMessage(undefined, "Get paper submission Successful", true, sub);
+
+            } else {
+
+                jsonString = msg.FormatMessage(undefined, "No paper submission Found", true, null);
+
+            }
+        }
+
+        res.end(jsonString);
+    });
+
+    next();
+});
+
+server.get('/DVP/API/:version/QAModule/QuestionPaperSubmission/Owner/:owner/Completed/:status',authorization({resource:"qualityassurance", action:"read"}),function (req, res, next) {
     logger.info("DVP-QAModule.GetQuestionPaperSubmission Internal method ");
     var company = parseInt(req.user.company);
     var tenant = parseInt(req.user.tenant);
     var jsonString;
+
+    /*TicketStatusFlow.find({company: company, tenant: tenant}).populate({path: 'flow_nodes.node',populate : {path: 'TicketStatusNode'}})
+        .populate('flow_connections.source').populate('flow_connections.targets').exec(function (err, stf) {
+            if (err) {
+                jsonString = messageFormatter.FormatMessage(err, "Get StatusFlow Failed", false, undefined);
+            } else {
+                jsonString = messageFormatter.FormatMessage(undefined, "Get StatusFlow Successful", true, stf);
+            }
+            res.end(jsonString);
+        });*/
+
     Submission.find({
         company: company,
         tenant: tenant,
-        completed: req.params.status
-    }, function (err, sub) {
+        completed: req.params.status,
+        owner: req.params.owner
+    }).populate('paper').populate({path: 'answers',populate : {path: 'question'}}).exec(function (err, sub) {
         //db.posts.find( //query today up to tonight  {"created_on": {"$gte": new Date(2012, 7, 14), "$lt": new Date(2012, 7, 15)}})
         if (err) {
 
