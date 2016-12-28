@@ -588,7 +588,7 @@ server.put('/DVP/API/:version/QAModule/QuestionPaper/:id/Question',authorization
                                     logger.info("DVP-QAModule.CreateQuestion successful");
                                     jsonString = msg.FormatMessage(err, "Question creation successful", true, question);
 
-                                    Paper.update({
+                                    qp.update({
                                         "$set": {
                                             "updated_at": Date.now()
                                         },
