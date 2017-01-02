@@ -33,7 +33,7 @@ module.exports = {
     {
         "vdomain": "LB_FRONTEND",
         "domain": "HOST_NAME",
-        "port": "HOST_USERSERVICE_PORT",
+        "port": "HOST_QAMODULE_PORT",
         "version": "HOST_VERSION"
     },
 
