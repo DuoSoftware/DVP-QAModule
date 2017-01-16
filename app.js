@@ -1189,7 +1189,7 @@ server.get('/DVP/API/:version/QAModule/QuestionPaperSubmission/Owner/:owner/Comp
         completed: req.params.status,
         owner: req.params.owner,
         created_at: {"$gte": new Date(req.params.stDate), "$lt": new Date(req.params.eDate)}
-    }).populate('paper').populate({path: 'answers',populate : {path: 'question'}}).exec(function (err, sub) {
+    }).populate('paper').populate({path: 'answers',populate : [{path: 'question'}, {path: 'section'}]}).exec(function (err, sub) {
         //db.posts.find( //query today up to tonight  {"created_on": {"$gte": new Date(2012, 7, 14), "$lt": new Date(2012, 7, 15)}})
         if (err) {
 
