@@ -18,6 +18,7 @@ var Section = require('dvp-mongomodels/model/QuestionPaper').QuestionSection;
 var Paper = require('dvp-mongomodels/model/QuestionPaper').QuestionPaper;
 var Submission = require('dvp-mongomodels/model/QuestionPaper').QuestionPaperSubmission;
 var Answer = require('dvp-mongomodels/model/QuestionPaper').QuestionAnswer;
+var User = require('dvp-mongomodels/model/User');
 
 
 
@@ -1140,7 +1141,7 @@ server.get('/DVP/API/:version/QAModule/QuestionPaperSubmission/Owner/:owner/Comp
         tenant: tenant,
         completed: req.params.status,
         owner: req.params.owner
-    }).populate('paper').populate({path: 'answers',populate : [{path: 'question'}, {path: 'section'}]}).exec(function (err, sub) {
+    }).populate('paper').populate('evaluator').populate({path: 'answers',populate : [{path: 'question'}, {path: 'section'}]}).exec(function (err, sub) {
         //db.posts.find( //query today up to tonight  {"created_on": {"$gte": new Date(2012, 7, 14), "$lt": new Date(2012, 7, 15)}})
         if (err) {
 
