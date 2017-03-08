@@ -18,6 +18,7 @@ var Section = require('dvp-mongomodels/model/QuestionPaper').QuestionSection;
 var Paper = require('dvp-mongomodels/model/QuestionPaper').QuestionPaper;
 var Submission = require('dvp-mongomodels/model/QuestionPaper').QuestionPaperSubmission;
 var Answer = require('dvp-mongomodels/model/QuestionPaper').QuestionAnswer;
+var User = require('dvp-mongomodels/model/User');
 
 
 
@@ -1177,6 +1178,55 @@ server.get('/DVP/API/:version/QAModule/QuestionPaperSubmission/Owner/:owner/Comp
         tenant: tenant,
         completed: req.params.status,
         owner: req.params.owner
+    }).populate('paper').populate('evaluator').populate({path: 'answers',populate : [{path: 'question'}, {path: 'section'}]}).exec(function (err, sub) {
+        //db.posts.find( //query today up to tonight  {"created_on": {"$gte": new Date(2012, 7, 14), "$lt": new Date(2012, 7, 15)}})
+        if (err) {
+
+            jsonString = msg.FormatMessage(err, "Get all papers submission failed", false, undefined);
+
+        } else {
+
+            if (sub) {
+
+                jsonString = msg.FormatMessage(undefined, "Get all papers submission  Successful", true, sub);
+
+            } else {
+
+                jsonString = msg.FormatMessage(undefined, "No question papers Found", false, qp);
+
+            }
+        }
+
+        res.end(jsonString);
+    });
+
+    next();
+});
+
+server.get('/DVP/API/:version/QAModule/QuestionPaperSubmission/Owner/:owner/Completed/:status/From/:stDate/To/:eDate',authorization({resource:"qualityassurance", action:"read"}),function (req, res, next) {
+    logger.info("DVP-QAModule.GetQuestionPaperSubmission Internal method ");
+    var company = parseInt(req.user.company);
+    var tenant = parseInt(req.user.tenant);
+    var jsonString;
+
+    console.log()
+
+    /*TicketStatusFlow.find({company: company, tenant: tenant}).populate({path: 'flow_nodes.node',populate : {path: 'TicketStatusNode'}})
+     .populate('flow_connections.source').populate('flow_connections.targets').exec(function (err, stf) {
+     if (err) {
+     jsonString = messageFormatter.FormatMessage(err, "Get StatusFlow Failed", false, undefined);
+     } else {
+     jsonString = messageFormatter.FormatMessage(undefined, "Get StatusFlow Successful", true, stf);
+     }
+     res.end(jsonString);
+     });*/
+
+    Submission.find({
+        company: company,
+        tenant: tenant,
+        completed: req.params.status,
+        owner: req.params.owner,
+        created_at: {"$gte": new Date(req.params.stDate), "$lt": new Date(req.params.eDate)}
     }).populate('paper').populate({path: 'answers',populate : [{path: 'question'}, {path: 'section'}]}).exec(function (err, sub) {
         //db.posts.find( //query today up to tonight  {"created_on": {"$gte": new Date(2012, 7, 14), "$lt": new Date(2012, 7, 15)}})
         if (err) {
