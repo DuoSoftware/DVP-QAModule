@@ -261,6 +261,43 @@ server.get('/DVP/API/:version/QAModule/Questions',authorization({resource:"quali
     next();
 });
 
+server.get('/DVP/API/:version/QAModule/Question/:id/ValidateSubmission',authorization({resource:"qualityassurance", action:"read"}),function (req, res, next) {
+    logger.info("DVP-QAModule.GetQuestions Internal method ");
+    var company = parseInt(req.user.company);
+    var tenant = parseInt(req.user.tenant);
+    var questionId = req.params.id;
+    var jsonString;
+    Answer.findOne({
+        company: company,
+        tenant: tenant,
+        question:questionId
+
+    }, function (err, answer) {
+        //db.posts.find( //query today up to tonight  {"created_on": {"$gte": new Date(2012, 7, 14), "$lt": new Date(2012, 7, 15)}})
+        if (err) {
+
+            jsonString = msg.FormatMessage(err, "Question submission validation failed", false, false);
+
+        }
+        else
+        {
+
+            if (answer)
+            {
+                jsonString = msg.FormatMessage(null, "Question already used in submission history", true, false);
+            }
+            else
+            {
+                jsonString = msg.FormatMessage(null, "Question not used in submission history", true, true);
+            }
+        }
+
+        res.end(jsonString);
+    });
+
+    next();
+});
+
 server.del('/DVP/API/:version/QAModule/Question/:id',authorization({resource:"qualityassurance", action:"delete"}),function (req, res, next) {
     logger.info("DVP-QAModule.DeleteQuestion Internal method ");
     var company = parseInt(req.user.company);
