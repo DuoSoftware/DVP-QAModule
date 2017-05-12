@@ -54,7 +54,7 @@ var mongopass = config.Mongo.password;
 
 
 var mongoose = require('mongoose');
-var connectionstring = util.format('mongodb://%s:%s@%s:%d/%s',mongouser,mongopass,mongoip,mongoport,mongodb);
+var connectionstring = '';
 mongoip = mongoip.split(',')
 if(util.isArray(mongoip)){
 
