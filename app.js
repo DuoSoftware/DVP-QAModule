@@ -50,6 +50,7 @@ var mongoport=config.Mongo.port;
 var mongodb=config.Mongo.dbname;
 var mongouser=config.Mongo.user;
 var mongopass = config.Mongo.password;
+var mongoreplicaset=config.Mongo.replicaset;
 
 
 
