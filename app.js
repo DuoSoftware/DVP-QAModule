@@ -708,6 +708,73 @@ server.put('/DVP/API/:version/QAModule/QuestionPaper/:id/Question',authorization
 
 });
 
+server.put('/DVP/API/:version/QAModule/QuestionPaper/:id/Activate/:active',authorization({resource:"qualityassurance", action:"write"}), function(req, res, next){
+
+
+    logger.debug("DVP-QAModule.AddQuestionToPaper HTTP");
+    var company;
+    var tenant;
+    var jsonString;
+
+    if(req&& req.user && req.user.company && req.user.tenant) {
+
+        company =req.user.company;
+        tenant = req.user.tenant;
+
+        var active = req.params.active;
+
+        Paper.findOne({
+            _id: req.params.id,
+            company: company,
+            tenant: tenant
+        }, function (err, qp)
+        {
+            if (err) {
+
+                jsonString = msg.FormatMessage(err, "Get question paper failed", false, undefined);
+                res.end(jsonString);
+
+            } else {
+
+                if (qp) {
+
+                    qp.update({
+                        "$set": {
+                            "active": active
+                        }
+                    }, function (err, obj)
+                    {
+                        if (err)
+                        {
+                            jsonString = msg.FormatMessage(err, "Fail to Find Paper", false, undefined);
+                            res.end(jsonString);
+                        }
+                        else
+                        {
+                            jsonString = msg.FormatMessage(undefined, "Question paper status changed successfully", true, obj);
+                            res.end(jsonString);
+                        }
+                        res.end(jsonString);
+
+                    });
+
+                } else {
+
+                    jsonString = msg.FormatMessage(undefined, "No question paper Found", false, undefined);
+                    res.end(jsonString);
+                }
+            }
+        });
+    }else{
+
+        jsonString = msg.FormatMessage(err, "Token error, no company data found", false, undefined)
+        res.end(jsonString);
+    }
+
+    return next();
+
+});
+
 server.del('/DVP/API/:version/QAModule/QuestionPaper/:id/Question/:qid',authorization({resource:"qualityassurance", action:"delete"}), function(req, res, next){
 
 
