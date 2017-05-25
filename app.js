@@ -565,6 +565,40 @@ server.get('/DVP/API/:version/QAModule/QuestionPapers',authorization({resource:"
     next();
 });
 
+server.get('/DVP/API/:version/QAModule/QuestionPapersAll',authorization({resource:"qualityassurance", action:"read"}),function (req, res, next) {
+    logger.info("DVP-QAModule.GetQuestionPapersAll Internal method ");
+    var company = parseInt(req.user.company);
+    var tenant = parseInt(req.user.tenant);
+    var jsonString;
+    Paper.find({
+        company: company,
+        tenant: tenant
+    }).populate('questions')
+        .exec(function (err, qp) {
+            //db.posts.find( //query today up to tonight  {"created_on": {"$gte": new Date(2012, 7, 14), "$lt": new Date(2012, 7, 15)}})
+            if (err) {
+
+                jsonString = msg.FormatMessage(err, "Get all question papers failed", false, undefined);
+
+            } else {
+
+                if (qp) {
+
+                    jsonString = msg.FormatMessage(undefined, "Get all question papers Successful", true, qp);
+
+                } else {
+
+                    jsonString = msg.FormatMessage(undefined, "No question papers Found", false, qp);
+
+                }
+            }
+
+            res.end(jsonString);
+        });
+
+    next();
+});
+
 server.get('/DVP/API/:version/QAModule/QuestionPaper/:id',authorization({resource:"qualityassurance", action:"read"}),function (req, res, next) {
     logger.info("DVP-QAModule.GetQuestionPaper Internal method ");
     var company = parseInt(req.user.company);
@@ -721,7 +755,7 @@ server.put('/DVP/API/:version/QAModule/QuestionPaper/:id/Activate/:active',autho
         company =req.user.company;
         tenant = req.user.tenant;
 
-        var active = req.params.active;
+        var active = (req.params.active == 'true');
 
         Paper.findOne({
             _id: req.params.id,
