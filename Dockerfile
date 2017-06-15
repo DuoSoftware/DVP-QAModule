@@ -8,7 +8,8 @@
 #EXPOSE 8884
 
 FROM node:5.10.0
-RUN git clone git://github.com/DuoSoftware/DVP-QAModule.git /usr/local/src/qamodule
+ARG VERSION_TAG
+RUN git clone -b $VERSION_TAG https://github.com/DuoSoftware/DVP-QAModule.git /usr/local/src/qamodule
 RUN cd /usr/local/src/qamodule;
 WORKDIR /usr/local/src/qamodule
 RUN npm install
