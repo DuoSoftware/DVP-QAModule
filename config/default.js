@@ -4,12 +4,12 @@ module.exports = {
   "Redis":
   {
     "mode":"sentinel",//instance, cluster, sentinel
-    "ip": "45.55.142.207",
+    "ip": "",
     "port": 6389,
-    "user": "duo",
-    "password": "DuoS123",
+    "user": "",
+    "password": "",
     "sentinels":{
-      "hosts": "138.197.90.92,45.55.205.92,138.197.90.92",
+      "hosts": "",
       "port":16389,
       "name":"redis-cluster"
     }
@@ -19,13 +19,13 @@ module.exports = {
   "Security":
   {
 
-    "ip" : "45.55.142.207",
+    "ip" : "",
     "port": 6389,
-    "user": "duo",
-    "password": "DuoS123",
+    "user": "",
+    "password": "",
     "mode":"sentinel",//instance, cluster, sentinel
     "sentinels":{
-      "hosts": "138.197.90.92,45.55.205.92,138.197.90.92",
+      "hosts": "",
       "port":16389,
       "name":"redis-cluster"
     }
@@ -48,21 +48,21 @@ module.exports = {
 
   "RabbitMQ":
   {
-    "ip": "45.55.142.207",
+    "ip": "",
     "port": 5672,
-    "user": "admin",
-    "password": "admin"
+    "user": "",
+    "password": ""
   },
 
 
   "Mongo":
   {
-    "ip":"104.236.231.11",
+    "ip":"",
     "port":"27017",
-    "dbname":"dvpdb",
-    "password":"DuoS123",
-    "user":"duo",
-    "replicaset" :"104.236.231.11"
+    "dbname":"",
+    "password":"",
+    "user":"",
+    "replicaset" :""
   }
 
 };
