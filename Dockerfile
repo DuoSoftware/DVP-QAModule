@@ -18,9 +18,9 @@
 
 
 FROM node:10-alpine
-WORKDIR /usr/local/src/conference
+WORKDIR /usr/local/src/qamodule
 COPY package*.json ./
 RUN npm install
 COPY . .
-EXPOSE 8821
+EXPOSE 8884
 CMD [ "node", "app.js" ]
